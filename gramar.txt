@@ -1,0 +1,57 @@
+terminal SALTOS, NUMERAL, ASTERISCO, PUNTO, MAS, PALABRA, ENTERO;
+
+non terminal documento, sentencia, elemento, header, estilo_texto, lista_mas, parrafo, lista_numerica, oracion;
+
+precedence left MAS; 
+precedence left PALABRA;
+precedence left ENTERO;
+
+start with documento;
+
+documento ::= sentencia;
+
+sentencia ::= elemento sentencia
+           | elemento
+           ;
+
+elemento  ::= NUMERAL header
+           | ASTERISCO estilo_texto  {: System.out.println("entro a estilo texto"); :}
+           | MAS lista_mas
+           | ENTERO PUNTO lista_numerica
+           | ENTERO parrafo
+           | PALABRA parrafo
+           | SALTOS
+           ;
+
+header  ::= NUMERAL parrafo SALTOS                 {: System.out.println("header nivel 2"); :}
+         | NUMERAL NUMERAL parrafo                  {: System.out.println("header nivel 3"); :}
+         | NUMERAL NUMERAL NUMERAL parrafo          {: System.out.println("header nivel 4"); :}
+         | NUMERAL NUMERAL NUMERAL NUMERAL parrafo  {: System.out.println("header nivel 5"); :}
+         | NUMERAL NUMERAL NUMERAL NUMERAL NUMERAL parrafo  {: System.out.println("header nivel 6"); :}
+         | parrafo SALTOS                            {: System.out.println("header nivel 1"); :}
+         | error                                     {: System.out.println("error en header"); :}
+         ;
+
+estilo_texto ::= parrafo ASTERISCO                        {: System.out.println("texto en italica"); :}
+              | ASTERISCO parrafo ASTERISCO ASTERISCO  {: System.out.println("texto en negrita"); :}
+              | ASTERISCO ASTERISCO parrafo ASTERISCO ASTERISCO ASTERISCO  {: System.out.println("texto en negrita e italica"); :}
+              | error                                             {: System.out.println("error en estilo_texto"); :}
+              ;
+
+lista_numerica ::= parrafo lista_numerica                    {: System.out.println("ultimo elemento en lista numerada"); :}
+                | ENTERO PUNTO parrafo lista_numerica      {: System.out.println("elemento adicional en lista numerada"); :}
+                | parrafo                                    {: System.out.println("un solo inciso"); :}
+                ;
+
+lista_mas ::= MAS parrafo lista_mas                                  {: System.out.println("elemento unico de lista con +"); :}
+            | parrafo SALTOS                         {: System.out.println("elemento de lista con + seguido de mas elementos"); :}
+            ;
+
+parrafo ::= oracion SALTOS parrafo 
+         | oracion SALTOS
+         | oracion;
+
+oracion ::= PALABRA oracion
+         | ENTERO oracion
+         | PALABRA
+         | ENTERO;

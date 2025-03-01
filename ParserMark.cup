@@ -1,0 +1,46 @@
+package com.mycompany.analizadorescompi;
+
+import com.mycompany.analizadorescompi.LexerMarkdown;
+import java_cup.runtime.*;
+
+parser code {:
+    public Parser(LexerMarkdown lex) {
+        super(lex);
+    }
+    
+    public void syntax_error(Symbol cur_token) {
+        System.out.println("Simbolo con error:" + symbl_name_from_id(cur_token.sym));
+        System.out.println("Linea " + cur_token.left);
+        System.out.println("Columna " + cur_token.right);
+        if (expected_token_ids().isEmpty()) {
+            System.out.println("ya no se esperaba ningun simbolo");
+        }
+    }
+    
+    public void unrecovered_syntax_error(Symbol cur_token) {
+        System.out.println("Error irrecuperable sobrecargado");
+    }
+:}
+
+
+terminal SALTOS, PALABRA, ENTERO;
+
+non terminal documento, parrafo, oracion, oracion_cont;
+
+start whit documento
+
+documento ::= contenido ;
+
+contenido ::= contenido parrafo
+            | contenido header
+            | parrafo
+            | header;
+
+parrafo ::= oracion SALTOS;
+
+oracion ::= PALABRA
+         | ENTERO
+         | PALABRA oracion
+         | ENTERO oracion;
+
+header ::= NUMERAL PALABRA SALTOS;
